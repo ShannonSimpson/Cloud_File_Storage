@@ -11,9 +11,21 @@ int main(int argc, char **argv)
 	port = atoi(argv[2]);
 
 	clientfd = Open_clientfd(host,port);
-	Fgets(buf, MAXLINE, stdin);
-	printf("do stuff\n");
 	
+	printf("type:");
+	fflush(stdout);
+	
+	Rio_readinitb(&rio, clientfd);
+
+	Fgets(buf, MAXLINE, stdin);
+	//printf("do stuff\n");
+	Rio_writen(clientfd, buf, strlen(buf));
+	Rio_readlineb(&rio, buf, MAXLINE);
+	printf("echo:");
+	Fputs(buf, stdout);
+	printf("type:");
+	fflush(stdout);	
+
 	Close(clientfd);
 	exit(0);
 }
