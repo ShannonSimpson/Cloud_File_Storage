@@ -1,9 +1,15 @@
-/*******************************************
-* The server loops endlessly		   *
-* waiting for a connection request	   *
-* It then reads input from the client and *
-* echo the input back to the client.      *
-*******************************************/
+/********************************************
+* The server loops endlessly		    *
+* waiting for a connection request	    *
+* It then reads input from the client and   *
+* echo the input back to the client.        *
+* 					    *
+* Mycloud Server:			    *
+* A mycloud server that accepts requests to *
+* store a file, retrieve a file, delete a   *
+* file, and list the files stored on the    *
+* server.				    *
+********************************************/
 int main(int argc, char **argv) {
 	// create and configure the listening socket
 	int listenfd, connfd, port, clientlen;
