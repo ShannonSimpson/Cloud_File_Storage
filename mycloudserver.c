@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	client_port = ntohs(clientaddr.sin_port);  //determining the Port?
 	printf("server connected to %s (%s), port %u\n",
 
-	hp->h_name, haddrp, client_port);
+	hp->(h_name, haddrp, client_port);
 
 	// read and reach input lines from client until the EOF
 	echo(connfd);
