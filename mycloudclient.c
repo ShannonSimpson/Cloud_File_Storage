@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stlib.h>
+#include <unistd.h>
 #include "csapp.h"
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -48,18 +51,27 @@ int send_request(req * rq, char* host, char *port, resp *rp)
 	socketInfo.ai_family = AF_INET;
 	socketInfo.ai_socktype = SOCK_STREAM;
 	getaddrinfo(host, port, &socketInfo, &serverInfo);
+	if(getaddrinfo(host, port, $socketInfo, &serverInfo)!= 0){
+		printf(stderr, "Hostname failed.\n");
+		return -4;
+	}
 	servAddr = serverInfo->ai_addr;
 	printf("here1\n");
 	connect(sock, servAddr, sizeof(*servAddr));
+	if(connect(sock, servaddr, sizeof(*servaddr)) < 0) {
+		printf(stderr, "Server connection failed.\n");
+		return -3;
+	}
 	printf("here2\n");
 	send(sock, rq, size_of_req(rq), 0);
+	if(read(sock, resp, MAX_SIZE) < 0) {
+		close(sock);
+		return -4;
+	}
 	printf("here3\n");
-	if(read(sock, rp, MAX_SIZE) < 0 )
-	{
-		printf("Failed to connect\n");
-		return -1;
-	}	
 	printf("made it here\n");
+
+	handle_response(resp);
 
 	if(rp->status == 1)
 	{
@@ -117,6 +129,25 @@ int main(int argc, char **argv)
 //	clientfd = Open_clientfd(host,port);
 	
 	//Rio_readinitb(&rio, clientfd);
+
+	switch (req.type) {
+		case REQ_STORE: req.size = fread(req.contents, sizeof(char), CONTENT_MAX, stdin);
+			rq.contents[req.size] = 0;
+			rq.size += 1;
+			break;
+		case REQ_GET: break;
+		case REQ_DELETE: break;
+		case REQ_LIST: break;
+	}
+
+	response resp;
+
+	if (send_request (&rq, host, port, &resp) < 0) {
+		exit(-5);
+	
+	}
+
+
 
 
 	exit(0);
