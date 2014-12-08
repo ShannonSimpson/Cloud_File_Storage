@@ -30,7 +30,6 @@ typedef struct resp_struct {
 
 size_t size_of_req(req* rq)
 {
-	printf("in size of\n");
 	return sizeof(rq)+MAX_FILENAME*sizeof(char)+sizeof(uint32_t)+sizeof(char)*rq->size;
 }
 
@@ -40,30 +39,35 @@ size_t request_size(req* rq) {
 
 int send_request(req * rq, char* host, char *port, resp *rp)
 {
-	int sock; 
-	printf("in send_request\n");
+	int sock;
+	struct addrinfo socketInfo;
+        struct addrinfo *p;
+        struct addrinfo *serverInfo;
+
+        memset(&socketInfo, 0, sizeof(struct addrinfo));
+ 
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		fprintf(stderr, "Failed to get socket\n"); 
 		return -2;
 	}
-	struct sockaddr *servAddr;
-	struct addrinfo socketInfo;
-	struct addrinfo *p;
-	struct addrinfo *serverInfo;
-	memset(&socketInfo, 0, sizeof(socketInfo));
 
 	socketInfo.ai_family = AF_INET;
 	socketInfo.ai_socktype = SOCK_STREAM;
+	socketInfo.ai_flags = 0;
+	socketInfo.ai_protocol = 0;
+
+	printf("req: %i\n host: %s\n port: %s\n resp: %s\n", rq->type, host, port, rp);
+
 	if(getaddrinfo(host, port, &socketInfo, &serverInfo)!= 0){
 		fprintf(stderr, "Hostname failed.\n");
 		return -4;
 	}
 	for(p = serverInfo; p!=NULL; p=p->ai_next)
 	{
-		if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol)))
+		if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol))== -1)
 		{
-			perror("server: socket:");
+			perror("server: socket");
 			continue;
 		}
 	
@@ -104,10 +108,7 @@ int send_request(req * rq, char* host, char *port, resp *rp)
 int get_rq (char *in)
 {
 	if(strncmp(in, "get", 3) == 0)
-	{
-		printf("in get\n");	
-		return GET; 	
-	}
+	{	return GET; 	}
 	else if(strncmp(in, "put", 3) == 0)
 	{	return STORE;	}
 	else if(strncmp(in, "del", 3) == 0 || strncmp(in, "rm", 2)== 0)
@@ -120,11 +121,16 @@ int get_rq (char *in)
 
 char* name_rq (int type) {
 	switch(type) {
-		case GET: return "get";
-		case STORE: return "put";
-		case DELETE: return "delete";
-		case LIST: return "list";
-		default: return "other";
+		case GET: 
+			return "get";
+		case STORE: 
+			return "put";
+		case DELETE: 
+			return "delete";
+		case LIST: 
+			return "list";
+		default: 
+			return "other";
 	}
 }
 
@@ -148,31 +154,54 @@ int main(int argc, char **argv)
 	port = argv[3];
 	rq.key = atoi(argv[4]);
 	rq.type = get_rq(argv[1]);
-
-	send_request(&rq, host, port, &rp);
-//	clientfd = Open_clientfd(host,port);
 	
-	//Rio_readinitb(&rio, clientfd);
+	if(rq.type == LIST)
+	{
+		if(argc != 5)
+		{
+			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> (<file>)\n", argv[1]);
+	        	exit(0);
+
+		}
+	}
+	else
+	{
+		if(argc != 6)
+		{
+			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> (<file>)\n", argv[1]);
+                        exit(0);
+		}
+		strncpy(rq.filename, argv[5], MAX_FILENAME);
+	}
+
 
 	switch (rq.type) {
 		case STORE: rq.size = fread(rq.soul, sizeof(char), MAX_SIZE, stdin);
 			rq.soul[rq.size] = 0;
 			rq.size += 1;
 			break;
-		case GET: break;
+		case GET:
+			printf("assigned get\n");
+			break;
 		case DELETE: break;
 		case LIST: break;
 	}
 
-
+	
 	if (send_request (&rq, host, port, &rp) < 0) {
-		exit(-5);
+		exit(-1);
 	
 	}
-
-
-
-
+	
+	if(rp.status == 1)
+	{
+		perror("Error\n");
+	}
+	if(rp.size > 0)
+	{
+		printf("%s", rp.soul);
+	}
+	printf("successful\n");
 	exit(0);
 }
 	

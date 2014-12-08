@@ -19,7 +19,7 @@
 
 #define MAX_PENDING 5
 
-void serve(int, int);
+//void serve(int, int);
 
 int main(int argc, char **argv) {
 	// create and configure the listening socket
@@ -45,10 +45,10 @@ int main(int argc, char **argv) {
 	}
 //	listenfd = open_listenfd(port);
 
-	memset(&severaddr, 0, sizeof(serveraddr));
+	memset(&serveraddr, 0, sizeof(struct sockaddr_in));
 	//ALL THE SINS
 	serveraddr.sin_family = AF_INET;	
-	serveraddr.sin_addr.s_addr = htonl(INADDDR_ANY);
+	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serveraddr.sin_port = htons(port);
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
@@ -61,13 +61,14 @@ int main(int argc, char **argv) {
 		exit(-4);
 	}
 
-	init_storage();
+//	init_storage();
 
 	// Begin the WHILE loop here
-	clientlen = sizeof(clientaddr);
+	client_length = sizeof(clientaddr);
 
 	//wait for the connection request
-	if(connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length)) {
+	connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
+	if(connfd <0) {
 		printf(stderr, "Accept(...) call failed.\n");
 		exit(-3);
 	}
@@ -82,12 +83,12 @@ int main(int argc, char **argv) {
 	echo(connfd);
 	*/
 	
-	serve(connrd, key);
+//	serve(connfd, key);
 
 	// close the connection
 	Close(connfd);
 	
 	//end the WHILE loop here
-	}
-	exit (0);
+		
+//	exit(0);
 } 
