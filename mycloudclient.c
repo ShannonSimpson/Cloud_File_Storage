@@ -80,13 +80,13 @@ int send_request(req * rq, char* host, char *port, resp *rp)
 			continue;	
 		}
 	}
-//	printf("here2\n");
+	printf("here2\n");
 	send(sock, rq, size_of_req(rq), 0);
 	if(read(sock, rp, MAX_SIZE) < 0) {
 		close(sock);
 		return -4;
 	}
-//	printf("here3\n");
+	printf("here3\n");
 
 	//handle_response(rp);
 
