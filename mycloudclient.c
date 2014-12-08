@@ -49,20 +49,32 @@ int send_request(req * rq, char* host, char *port, resp *rp)
 	}
 	struct sockaddr *servAddr;
 	struct addrinfo socketInfo;
+	struct addrinfo *p;
 	struct addrinfo *serverInfo;
 	memset(&socketInfo, 0, sizeof(socketInfo));
 
-	socketInfo.ai_family = AF_UNSPEC;
+	socketInfo.ai_family = AF_INET;
 	socketInfo.ai_socktype = SOCK_STREAM;
 	if(getaddrinfo(host, port, &socketInfo, &serverInfo)!= 0){
 		fprintf(stderr, "Hostname failed.\n");
 		return -4;
 	}
-	servAddr = serverInfo->ai_addr;
+	for(p = serverInfo; p!=NULL; p=p->ai_next)
+	{
+		if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol)))
+		{
+			perror("server: socket:");
+			continue;
+		}
+	
+	
 //	printf("here1\n");
-	if(connect(sock, servAddr, sizeof(*servAddr)) < 0) {
-		fprintf(stderr, "Server connection failed.\n");
-		return -3;	
+		if(connect(sock, p->ai_addr, p->ai_addrlen) == -1)
+		{
+			close(sock);
+			fprintf(stderr, "Server connection failed.\n");
+			continue;	
+		}
 	}
 //	printf("here2\n");
 	send(sock, rq, size_of_req(rq), 0);
