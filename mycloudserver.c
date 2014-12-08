@@ -19,7 +19,62 @@
 
 #define MAX_PENDING 5
 
-//void serve(int, int);
+void log_rq(req* rq, bool success) {
+	printf("Secret Key = %d\n", rq->key);
+	printf("Request Type = %s\n", get_rq(req->type));
+	if(rq->type == LIST) {
+		printf("Filename = NONE\n");
+	}
+	else {
+		printf("Filename = %s\n", rq->filename);
+	}
+
+	if(success) {
+		printf("Operation Status = success\n");
+	} 
+	else {
+		printf("Operation Status = error\n");
+	}
+	printf("--------------------------\n");
+}
+
+void file_into_response(file* f, response* res) {
+
+}
+
+void serve(int connfd, int secret) {
+	size_t n;
+	bool success;
+
+	req rq;
+	resp rp;
+	rp.status = RESP_OK;
+	rp.size = 0;
+  
+	if((n = recv(connfd, &req, sizeof(request), 0)) != 0) {
+		switch(rq.type) {
+			case STORE:
+				success = store_file(rq.filename, rq.contents, rq.size);
+				break;
+			case DELETE:
+				success = delete_file(rq.filename);
+				break;
+			case LIST:
+				success = true;
+				list_files(&rp);
+				break;
+			case GET:
+				success = get_file(req.filename, &rp);
+				break;
+		}
+		if (!success) {
+			rp.status = RESP_ERROR;
+		}
+		log_req(&rq, success);
+		send(connfd, &rp, response_size(&rp), 0);
+		success = false;
+	}
+}
 
 int main(int argc, char **argv) {
 	// create and configure the listening socket
@@ -40,7 +95,7 @@ int main(int argc, char **argv) {
 	key = atoi(argv[2]);
 
 	if((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-		printf(stderr, "Nope. No socket obtained.\n");
+		fprintf(stderr, "Nope. No socket obtained.\n");
 		exit(-1);
 	}
 //	listenfd = open_listenfd(port);
@@ -52,12 +107,12 @@ int main(int argc, char **argv) {
 	serveraddr.sin_port = htons(port);
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
-		printf("Could not bind to port, sir.\n");
+		fprintf("Could not bind to port, sir.\n");
 		exit(-2);
 	}
 	
 	if(listen(listenfd, MAX_PENDING) < 0) {
-		printf(stderr, "Listening(...) Call failed. Hanging up now.\n");
+		fprintf(stderr, "Listening(...) Call failed. Hanging up now.\n");
 		exit(-4);
 	}
 
@@ -69,7 +124,7 @@ int main(int argc, char **argv) {
 	//wait for the connection request
 	connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
 	if(connfd <0) {
-		printf(stderr, "Accept(...) call failed.\n");
+		fprintf(stderr, "Accept(...) call failed.\n");
 		exit(-3);
 	}
 	/* I really don't think there is a point to this chunk.
