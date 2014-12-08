@@ -52,32 +52,42 @@ int main(int argc, char **argv) {
 	serveraddr.sin_port = htons(port);
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
-		printf(stderr, ("Listening(...) Call failed. Hanging up now.\n");
-		exit(-4);
+		printf("Could not bind to port, sir.\n");
+		exit(-2);
 	}
 	
+	if(listen(listenfd, MAX_PENDING) < 0) {
+		printf(stderr, "Listening(...) Call failed. Hanging up now.\n");
+		exit(-4);
+	}
+
 	init_storage();
 
 	// Begin the WHILE loop here
 	clientlen = sizeof(clientaddr);
 
 	//wait for the connection request
-	connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
+	if(connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length)) {
+		printf(stderr, "Accept(...) call failed.\n");
+		exit(-3);
+	}
+	/* I really don't think there is a point to this chunk.
 	hp = Gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr,
-
 	sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-
 	haddrp = inet_ntoa(clientaddr.sin_addr);  //determining the IP Address?
 	client_port = ntohs(clientaddr.sin_port);  //determining the Port?
 	printf("server connected to %s (%s), port %u\n",
-
 	hp->(h_name, haddrp, client_port);
-
 	// read and reach input lines from client until the EOF
 	echo(connfd);
+	*/
+	
+	serve(connrd, key);
 
 	// close the connection
 	Close(connfd);
 	
 	//end the WHILE loop here
+	}
+	exit (0);
 } 
