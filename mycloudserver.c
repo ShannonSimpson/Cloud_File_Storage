@@ -16,11 +16,71 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include "reqresp.h"
 
 #define MAX_PENDING 5
+#define GOOD 0
+#define BAD 1
 
-//void serve(int, int);
+void printOut(ReqResp * rq)
+{
+	printf("Secret Key = %d\n", rq->key);
+	printf("Request Type = %c\n", get_name(rq->type));
+	if(rq->type != LIST)
+	{
+		printf("Filename = %c\n", rq->filename);
+	}
+	else
+	{
+		printf("Filename = NONE\n");
+	}
+}
 
+void executeReq(int connfd, int key)
+{
+	bool complete = false;
+	ReqResp rq;
+	ReqResp rp;
+
+	rp.status = GOOD;
+	rp.size = 0; 
+
+	size_t recieved;
+	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
+	{
+		if(rq.type == GET)
+		{
+			complete = TRUE;
+			
+		}
+		else if(rq.type == PUT)
+		{
+			complete = TRUE;
+		}
+		else if(rq.type == DELETE)
+		{
+			complete = TRUE;
+		}
+		else if(rq.type == LIST)
+		{
+			complete = TRUE;
+		}
+	}
+	printOut(&rq);
+	if(complete == false)
+	{
+		printf("Operation Status = Error\n");
+	}
+	else if(complete == true)
+	{
+		printf("Operation Status = Success\n");
+		complete = false;
+		send(connfd, &rp, get_size(rp), 0)
+	{
+	printf("------------------------------------\n")
+	
+	
+}
 int main(int argc, char **argv) {
 	// create and configure the listening socket
 	int listenfd, connfd, port, key;	
@@ -61,8 +121,7 @@ int main(int argc, char **argv) {
 		exit(-4);
 	}
 
-//	init_storage();
-
+	//init_storage
 	// Begin the WHILE loop here
 	client_length = sizeof(clientaddr);
 
@@ -83,7 +142,7 @@ int main(int argc, char **argv) {
 	echo(connfd);
 	*/
 	
-//	serve(connfd, key);
+	serve(connfd, key);
 
 	// close the connection
 	Close(connfd);
