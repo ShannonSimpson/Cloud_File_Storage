@@ -122,7 +122,8 @@ int main(int argc, char **argv)
 	}
 
 	
-	if (send_request (&rq, host, port, &rp) < 0) {
+	if (send_request (&rq, host, port, &rp) < 0) 
+	{
 		exit(-1);
 	
 	}

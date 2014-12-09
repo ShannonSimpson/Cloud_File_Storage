@@ -53,12 +53,17 @@ void executeReq(int connfd, int key)
 	{
 		if(rq.type == GET)
 		{
-			complete = true;
-			
+			if(mycloud_getfile(rq.filename, &rp) == 0)
+			{
+				complete = true;
+			}
 		}
 		else if(rq.type == STORE)
 		{
-			complete = true;
+			if(mycloud_putfile(rq.filename, rq.soul, rq.size) == 0)
+			{
+				complete = true;
+			}
 		}
 		else if(rq.type == DELETE)
 		{
@@ -124,33 +129,26 @@ int main(int argc, char **argv) {
 		exit(-4);
 	}
 
-	//init_storage
+
+	create_storage();
 	// Begin the WHILE loop here
-	client_length = sizeof(clientaddr);
+	while(1)
+	{
+		client_length = sizeof(clientaddr);
 
 	//wait for the connection request
-	connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
-	if(connfd <0) {
-		fprintf(stderr, "Accept(...) call failed.\n");
-		exit(-3);
-	}
-	/* I really don't think there is a point to this chunk.
-	hp = Gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr,
-	sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-	haddrp = inet_ntoa(clientaddr.sin_addr);  //determining the IP Address?
-	client_port = ntohs(clientaddr.sin_port);  //determining the Port?
-	printf("server connected to %s (%s), port %u\n",
-	hp->(h_name, haddrp, client_port);
-	// read and reach input lines from client until the EOF
-	echo(connfd);
-	*/
-	
-	executeReq(connfd, key);
-
-	// close the connection
-	close(connfd);
-	
-	//end the WHILE loop here
+		connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
+		if(connfd <0) 
+		{
+			fprintf(stderr, "Accept(...) call failed.\n");
+			exit(-3);
+		}
 		
-//	exit(0);
+		executeReq(connfd, key);
+		//close connection
+		close(connfd);
+	}
+	
+		
+	exit(0);
 } 

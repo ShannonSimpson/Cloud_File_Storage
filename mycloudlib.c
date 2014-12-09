@@ -2,13 +2,20 @@
 #include<stdbool.h>
 #include<stdint.h>
 #include<stdio.h>
+#include<string.h>
 #include "reqresp.h"
 #include "mycloudlib.h"
 
 storage files[MAX_NUM_FILES];
 
-//put init storage in the server code (why the fuck not?)
-
+void create_storage()
+{
+	int i;
+	for(i = 0; i < MAX_NUM_FILES; i++)
+	{
+		files[i].empty = true;
+	}
+}
 int get_pos(char *filename)
 {
 	int i;
@@ -53,6 +60,7 @@ int mycloud_putfile(char *filename, char *soul, size_t soul_size)
 	if(i < 0)
 	{
 		i = next_pos();
+
 		if(i < 0)
 		{
 			return -1;
