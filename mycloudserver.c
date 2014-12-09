@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 	key = atoi(argv[2]);
 
 	if((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-		printf(stderr, "Nope. No socket obtained.\n");
+		fprintf(stderr, "Nope. No socket obtained.\n");
 		exit(-1);
 	}
 //	listenfd = open_listenfd(port);
@@ -112,12 +112,12 @@ int main(int argc, char **argv) {
 	serveraddr.sin_port = htons(port);
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
-		printf("Could not bind to port, sir.\n");
+		fprintf("Could not bind to port, sir.\n");
 		exit(-2);
 	}
 	
 	if(listen(listenfd, MAX_PENDING) < 0) {
-		printf(stderr, "Listening(...) Call failed. Hanging up now.\n");
+		fprintf(stderr, "Listening(...) Call failed. Hanging up now.\n");
 		exit(-4);
 	}
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
 	//wait for the connection request
 	connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
 	if(connfd <0) {
-		printf(stderr, "Accept(...) call failed.\n");
+		fprintf(stderr, "Accept(...) call failed.\n");
 		exit(-3);
 	}
 	/* I really don't think there is a point to this chunk.
