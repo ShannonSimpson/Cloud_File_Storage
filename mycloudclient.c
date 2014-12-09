@@ -29,8 +29,6 @@ int send_request(ReqResp * rq, char* host, char *port, ReqResp *rp)
 	socketInfo.ai_flags = 0;
 	socketInfo.ai_protocol = 0;
 
-	printf("req: %i\n host: %s\n port: %s\n resp: %s\n", rq->type, host, port, rp);
-
 	if(getaddrinfo(host, port, &socketInfo, &serverInfo)!= 0){
 		fprintf(stderr, "Hostname failed.\n");
 		return -4;
@@ -52,13 +50,11 @@ int send_request(ReqResp * rq, char* host, char *port, ReqResp *rp)
 			continue;	
 		}
 	}
-	printf("here2\n");
 	send(sock, rq, size_of_ReqResp(rq), 0);
 	if(read(sock, rp, MAX_SIZE) < 0) {
 		close(sock);
 		return -4;
 	}
-	printf("here3\n");
 
 	//handle_response(rp);
 
@@ -118,16 +114,11 @@ int main(int argc, char **argv)
 	}
 
 
-	switch (rq.type) {
-		case STORE: rq.size = fread(rq.soul, sizeof(char), MAX_SIZE, stdin);
-			rq.soul[rq.size] = 0;
-			rq.size += 1;
-			break;
-		case GET:
-			printf("assigned get\n");
-			break;
-		case DELETE: break;
-		case LIST: break;
+	if(rq.type == STORE)
+	{
+		rq.size = fread(rq.soul, sizeof(char), MAX_SIZE, stdin);
+		rq.soul[rq.size] = 0;
+		rq.size += 1;
 	}
 
 	

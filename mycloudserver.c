@@ -17,7 +17,9 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
+
 #include "reqresp.h"
+#include "mycloudlib.h"
 
 #define MAX_PENDING 5
 #define GOOD 0
@@ -26,10 +28,10 @@
 void printOut(ReqResp * rq)
 {
 	printf("Secret Key = %d\n", rq->key);
-	printf("Request Type = %c\n", name_rq(rq->type));
+	printf("Request Type = %s\n", name_rq(rq->type));
 	if(rq->type != LIST)
 	{
-		printf("Filename = %c\n", rq->filename);
+		printf("Filename = %s\n", rq->filename);
 	}
 	else
 	{
@@ -146,7 +148,7 @@ int main(int argc, char **argv) {
 	executeReq(connfd, key);
 
 	// close the connection
-	Close(connfd);
+	close(connfd);
 	
 	//end the WHILE loop here
 		
