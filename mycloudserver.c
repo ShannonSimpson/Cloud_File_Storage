@@ -125,6 +125,7 @@ int main(int argc, char **argv) {
 	}
 
 	//init_storage
+	create_storage();
 	// Begin the WHILE loop here
 	client_length = sizeof(clientaddr);
 
