@@ -129,9 +129,7 @@ int main(int argc, char **argv) {
 		exit(-4);
 	}
 
-
 	create_storage();
-	// Begin the WHILE loop here
 	while(1)
 	{
 		client_length = sizeof(clientaddr);
