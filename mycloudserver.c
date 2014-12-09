@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 #include "reqresp.h"
 
 #define MAX_PENDING 5
@@ -25,7 +26,7 @@
 void printOut(ReqResp * rq)
 {
 	printf("Secret Key = %d\n", rq->key);
-	printf("Request Type = %c\n", get_name(rq->type));
+	printf("Request Type = %c\n", name_rq(rq->type));
 	if(rq->type != LIST)
 	{
 		printf("Filename = %c\n", rq->filename);
@@ -50,20 +51,20 @@ void executeReq(int connfd, int key)
 	{
 		if(rq.type == GET)
 		{
-			complete = TRUE;
+			complete = true;
 			
 		}
-		else if(rq.type == PUT)
+		else if(rq.type == STORE)
 		{
-			complete = TRUE;
+			complete = true;
 		}
 		else if(rq.type == DELETE)
 		{
-			complete = TRUE;
+			complete = true;
 		}
 		else if(rq.type == LIST)
 		{
-			complete = TRUE;
+			complete = true;
 		}
 	}
 	printOut(&rq);
@@ -75,9 +76,9 @@ void executeReq(int connfd, int key)
 	{
 		printf("Operation Status = Success\n");
 		complete = false;
-		send(connfd, &rp, get_size(rp), 0)
-	{
-	printf("------------------------------------\n")
+		send(connfd, &rp, size_of_ReqResp(&rp), 0);
+	}
+	printf("------------------------------------\n");
 	
 	
 }
@@ -112,7 +113,7 @@ int main(int argc, char **argv) {
 	serveraddr.sin_port = htons(port);
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
-		fprintf("Could not bind to port, sir.\n");
+		printf("Could not bind to port, sir.\n");
 		exit(-2);
 	}
 	
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
 	echo(connfd);
 	*/
 	
-	serve(connfd, key);
+	executeReq(connfd, key);
 
 	// close the connection
 	Close(connfd);
