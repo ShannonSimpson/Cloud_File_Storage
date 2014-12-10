@@ -25,7 +25,7 @@
 #define GOOD 0
 #define BAD 1
 
-void printOut(ReqResp * rq)
+/*void printOut(ReqResp * rq)
 {
 	printf("Secret Key = %d\n", rq->key);
 	printf("Request Type = %s\n", name_rq(rq->type));
@@ -37,9 +37,9 @@ void printOut(ReqResp * rq)
 	{
 		printf("Filename = NONE\n");
 	}
-}
+}*/
 
-void executeReq(int connfd, int key)
+/*void executeReq(int connfd, int key)
 {
 	bool complete = false;
 	ReqResp rq;
@@ -88,7 +88,7 @@ void executeReq(int connfd, int key)
 	printf("------------------------------------\n");
 	
 	
-}
+}*/
 int main(int argc, char **argv) {
 	// create and configure the listening socket
 	int listenfd, connfd, port, key;	
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
 			exit(-3);
 		}
 		
-		executeReq(connfd, key);
+		executeReq(port, connfd, key);
 		//close connection
 		close(connfd);
 	}
