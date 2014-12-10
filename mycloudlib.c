@@ -252,6 +252,9 @@ int mycloud_listfiles(char *port, int key)
 	int i;
 	for(i = 0; i < MAX_NUM_FILES; i++)
 	{
-		printf("%s\n", files[i].filename);
+		if(!files[i].empty)
+		{
+			printf("%s\n", files[i].filename);
+		}
 	}
 }
