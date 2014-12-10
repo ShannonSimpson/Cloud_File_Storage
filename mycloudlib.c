@@ -69,8 +69,11 @@ void executeReq(char* port, int key, int connfd)
 		}
                 else if(rq.type == LIST)
                 {
-                       	complete = true;
-                }
+                       	if(mycloud_listfiles(port,key) == 0)
+			{
+				complete = true;
+                	}
+		}
 		}
         }
 
@@ -232,7 +235,8 @@ int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul
 	return 0;
 }
 
-int mycloud_delfile(char *port, int key, char* filename) {
+int mycloud_delfile(char *port, int key, char* filename)
+{
 	int i = get_pos(filename);
 	if(i == -1) {
 		return -1;
@@ -243,3 +247,11 @@ int mycloud_delfile(char *port, int key, char* filename) {
 	}
 }
 
+int mycloud_listfiles(char *port, int key)
+{
+	int i;
+	for(i = 0; i < MAX_NUM_FILES; i++)
+	{
+		printf("%s\n", files[i].filename);
+	}
+}
