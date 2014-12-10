@@ -17,7 +17,10 @@ int get_pos(char *filename);
 int next_pos();
 int mycloud_getfile(char *filename, ReqResp *rp);
 int mycloud_putfile(char* port, int key, char *filename, char *soul, size_t soul_size);
-//bool delete_file(char * filename);
+int mycloud_delfile(char * port, int key, char * filename);
+int mycloud_listfiles(char *port, int key);
+
+
 //What Jimmy wants:
 //int mycloud_delfile(char *MachineName, int TCPport, int SecretKey, char *Filename)
 
