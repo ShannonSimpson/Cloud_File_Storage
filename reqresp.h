@@ -14,9 +14,9 @@
 typedef struct ReqResp_struct {
         int key;
         int type;
+	int size;
         char filename[MAX_FILENAME];
         char soul[MAX_SIZE];
-        uint32_t size;
         uint32_t status;
 }ReqResp;
 

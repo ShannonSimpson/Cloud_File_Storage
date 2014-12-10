@@ -16,6 +16,36 @@
 
 storage files[MAX_NUM_FILES];
 
+int response_check(ReqResp * rq, ReqResp * rp)
+{
+
+        if(rp->type == GET || rp->type == LIST)
+        {
+                if(rp->size > 0)
+                {
+                        return 0;
+                }
+                return -1;
+        }
+        if(rp->type == STORE)
+        {
+                if((rp->size > 0) && (strcmp(rp->soul, rq->soul) == 0));
+                {
+                        return 0;
+                }
+                return -1;
+        }
+        if(rp->type == DELETE)
+        {
+                int i;
+		if(rp->status == 0)
+		{
+			return 0;
+		}
+		return -1;
+        }
+}
+
 
 void printOut(ReqResp * rq)
 {
@@ -39,11 +69,12 @@ void executeReq(char* port, int key, int connfd)
         ReqResp rq;
         ReqResp rp;
 	
-	rp.status = GOOD;
+	rp.status = -1;
 	rp.size = 0;
        	size_t recieved;
        	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
         {
+		rp.type = rq.type;
 		if(rq.key == key)
 		{
 		if(rq.type == GET)
@@ -51,10 +82,12 @@ void executeReq(char* port, int key, int connfd)
                     	if(mycloud_getfile(rq.filename, &rp) == 0)
                        	{
                                 	complete = true;
-                        	}
+                       	}
                 }
                 else if(rq.type == STORE)
-                {	
+                {
+			printf("size: %i\n", rq.size);	
+			printf("soul = %s\n", rq.soul);
                        	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
                        	{
                                	complete = true;
@@ -65,6 +98,7 @@ void executeReq(char* port, int key, int connfd)
                        	if(mycloud_delfile(port, key, rq.filename) == 0)
 			{
 				complete = true;
+				rp.status = 0;
                		}
 		}
                 else if(rq.type == LIST)
@@ -139,26 +173,22 @@ int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
 	send(sock, rq, size_of_ReqResp(rq), 0);
 
 //	executeReq(&host, port, connfd, key);
-/*      send(sock, rq, size_of_ReqResp(rq), 0);
         if(read(sock, rp, MAX_SIZE) < 0) {
                 close(sock);
                 return -4;
         }
-*/
-        //handle_response(rp);
+	
+	if(response_check(rq, rp) == 0)
+	{
+		printf("success\n");
+	}
+	else
+	{
+		printf("error\n");
+	}
 
-/*      if(rp->status == 1)
-        {
-                close(sock);
-                printf("error\n");
-        }
-        if(rp->size > 0)
-        {
-                printf("%s\n", rp->returns);
-        }
-*/      close(sock);
+        close(sock);
         freeaddrinfo(serverInfo);
-        printf("request sent successfully\n");
         return 0;
 }
                 
@@ -238,10 +268,12 @@ int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul
 int mycloud_delfile(char *port, int key, char* filename)
 {
 	int i = get_pos(filename);
-	if(i == -1) {
+	if(i == -1) 
+	{
 		return -1;
 	}
-	else {
+	else 
+	{
 		files[i].empty = true;
 		return 0;
 	}

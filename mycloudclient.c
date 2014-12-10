@@ -78,6 +78,38 @@
 	printf("request sent successfully\n");
 	return 0;
 }*/
+/*int response_check(ReqResp * rq, ReqResp * rp)
+{
+	
+	if(rp->type == GET || rp->type == LIST)
+	{
+		if(rp->size > 0)
+		{
+			return 0;	
+		}
+		return -1;
+	}
+	if(rp->type == STORE)
+	{
+		if((rp->size > 0) && (strcmp(rp->soul, rq->soul) == 0));
+		{
+			return 0;
+		}
+		return -1;
+	}
+	if(rp->type == DELETE)
+	{
+		int i; 
+		for(i = 0; i < MAX_NUM_FILES; i++)
+		{
+			if(files[i].filename == rq->filename);
+			{
+				return -1;
+			}
+		}
+		return 0; 
+	}
+}*/
 
 
 int main(int argc, char **argv)
@@ -135,15 +167,15 @@ int main(int argc, char **argv)
 	
 	}
 	
-	if(rp.status == 1)
+/*	if(response_check(&rq, &rp) == 0)
 	{
-		perror("Error\n");
+		printf("successful\n");
 	}
-	if(rp.size > 0)
+	else
 	{
-		printf("%s", rp.soul);
-	}
-	printf("successful\n");
+		perror("error\n");
+	}*/
+
 	exit(0);
 }
 	
