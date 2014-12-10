@@ -226,4 +226,14 @@ int mycloud_putfile(char* host, int *port, int *key, char *filename, char *soul,
 	return 0;
 }
 
+int delete_file(char* filename) {
+	int i = get_pos(filename);
+	if(i == -1) {
+		return -1;
+	}
+	else {
+		files[i].empty = -1;
+		return 1;
+	}
+}
 
