@@ -130,7 +130,6 @@ int main(int argc, char **argv)
 	host = argv[2];
 	port = argv[3];
 	rq.key = atoi(argv[4]);
-	printf("key: %i\n", rq.key);
 	rq.type = get_rq(argv[1]);
 	
 	if(rq.type == LIST)
@@ -156,8 +155,8 @@ int main(int argc, char **argv)
 	if(rq.type == STORE)
 	{
 		rq.size = fread(rq.soul, sizeof(char), MAX_SIZE, stdin);
-		rq.soul[rq.size] = 0;
-		rq.size += 1;
+		rq.soul[rq.size] = 0;	
+		rq.size = rq.size +1;
 	}
 
 	
@@ -166,16 +165,14 @@ int main(int argc, char **argv)
 		exit(-1);
 	
 	}
-	
-/*	if(response_check(&rq, &rp) == 0)
+	if(rp.size > 0)
 	{
-		printf("successful\n");
+		printf("%s\n", rp.soul);
 	}
-	else
+	if(rp.type == LIST)
 	{
-		perror("error\n");
-	}*/
-
+		printf("%s\n", list);
+	}
 	exit(0);
 }
 	

@@ -106,13 +106,11 @@ int main(int argc, char **argv) {
 
 	port = atoi(argv[1]); /* the server listens on a port passed on the command line */
 	key = atoi(argv[2]);
-	printf("key: %i\n", key);
 
 	if((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 		fprintf(stderr, "Nope. No socket obtained.\n");
 		exit(-1);
 	}
-//	listenfd = open_listenfd(port);
 
 	memset(&serveraddr, 0, sizeof(struct sockaddr_in));
 	//ALL THE SINS
@@ -122,12 +120,12 @@ int main(int argc, char **argv) {
 
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
 		printf("Could not bind to port, sir.\n");
-		exit(-2);
+		exit(-1);
 	}
 	
 	if(listen(listenfd, MAX_PENDING) < 0) {
 		fprintf(stderr, "Listening(...) Call failed. Hanging up now.\n");
-		exit(-4);
+		exit(-1);
 	}
 
 	create_storage();
@@ -135,16 +133,15 @@ int main(int argc, char **argv) {
 	{
 		client_length = sizeof(clientaddr);
 
-	//wait for the connection request
+		//wait for the connection request
 		connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &client_length);
 		if(connfd <0) 
 		{
 			fprintf(stderr, "Accept(...) call failed.\n");
-			exit(-3);
+			exit(-1);
 		}
 		
 		executeReq(port, key, connfd);
-		//close connection
 		close(connfd);
 	}
 	
