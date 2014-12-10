@@ -98,6 +98,7 @@ int main(int argc, char **argv)
 	host = argv[2];
 	port = argv[3];
 	rq.key = atoi(argv[4]);
+	printf("key: %i\n", rq.key);
 	rq.type = get_rq(argv[1]);
 	
 	if(rq.type == LIST)
