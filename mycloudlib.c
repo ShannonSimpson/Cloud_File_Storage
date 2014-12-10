@@ -38,37 +38,39 @@ void executeReq(char* port, int key, int connfd)
         bool complete = false;
         ReqResp rq;
         ReqResp rp;
-	if(key == rq.key)
-	{
-	        rp.status = GOOD;
-		rp.size = 0;
-       		size_t recieved;
-       		if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
+	
+	rp.status = GOOD;
+	rp.size = 0;
+       	size_t recieved;
+       	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
+        {
+		if(rq.key == key)
+		{
+		if(rq.type == GET)
+               	{
+                    	if(mycloud_getfile(rq.filename, &rp) == 0)
+                       	{
+                                	complete = true;
+                        	}
+                }
+                else if(rq.type == STORE)
+                {	
+                       	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
+                       	{
+                               	complete = true;
+                       	}
+                }
+                else if(rq.type == DELETE)
                 {
-			if(rq.type == GET)
-                	{
-                        	if(mycloud_getfile(rq.filename, &rp) == 0)
-                        	{
-                                	complete = true;
-                        	}
-                	}
-                	else if(rq.type == STORE)
-                	{	
-                        	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
-                        	{
-                                	complete = true;
-                        	}
-                	}
-                	else if(rq.type == DELETE)
-                	{
-                        	complete = true;
-                	}
-                	else if(rq.type == LIST)
-                	{
-                        	complete = true;
-                	}
-        	}
-	}
+                       	complete = true;
+                }
+                else if(rq.type == LIST)
+                {
+                       	complete = true;
+                }
+		}
+        }
+
         printOut(&rq);
         if(complete == false)
         {
