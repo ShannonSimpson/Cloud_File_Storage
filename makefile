@@ -8,5 +8,5 @@ client: reqresp.o mycloudclient.o mycloudlib.o
 %.o: %.c
 	${CC} $< -pthread -c -o $@
 clean:
-	rm -f */*.o server client
+	rm -f *.o server client
 
