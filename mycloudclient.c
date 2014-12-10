@@ -6,10 +6,10 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-
+#include "mycloudlib.h"
 #include "reqresp.h"
 
-int send_request(ReqResp * rq, char* host, char *port, ReqResp *rp)
+/*int send_request(ReqResp * rq, char* host, char *port, int *key, ReqResp *rp)
 {
 	int sock;
 	struct addrinfo socketInfo;
@@ -50,12 +50,18 @@ int send_request(ReqResp * rq, char* host, char *port, ReqResp *rp)
 			continue;	
 		}
 	}
-	send(sock, rq, size_of_ReqResp(rq), 0);
+
+	if(rq->type == STORE)
+	{
+		mycloud_putfile(host, port, key, rq->filename, rq->soul, rq->size);
+				
+	}
+*	send(sock, rq, size_of_ReqResp(rq), 0);
 	if(read(sock, rp, MAX_SIZE) < 0) {
 		close(sock);
 		return -4;
 	}
-
+*/
 	//handle_response(rp);
 
 /*	if(rp->status == 1)
@@ -67,11 +73,11 @@ int send_request(ReqResp * rq, char* host, char *port, ReqResp *rp)
 	{
 		printf("%s\n", rp->returns);
 	}
-*/	close(sock);
+	close(sock);
 	freeaddrinfo(serverInfo);
 	printf("request sent successfully\n");
 	return 0;
-}
+}*/
 
 
 int main(int argc, char **argv)
@@ -122,7 +128,7 @@ int main(int argc, char **argv)
 	}
 
 	
-	if (send_request (&rq, host, port, &rp) < 0) 
+	if (send_request(&rq, host, port, rq.key, &rp) < 0) 
 	{
 		exit(-1);
 	
