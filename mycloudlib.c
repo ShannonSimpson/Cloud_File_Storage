@@ -1,3 +1,4 @@
+
 #include<stdlib.h>
 #include<stdbool.h>
 #include<stdint.h>
@@ -15,7 +16,7 @@
 #define BAD 1
 
 storage files[MAX_NUM_FILES];
-char list[MAX_NUM_FILES*MAX_FILENAME];
+//char list[MAX_NUM_FILES*MAX_FILENAME];
 
 int response_check(ReqResp * rq, ReqResp * rp)
 {
@@ -86,7 +87,6 @@ void executeReq(char* port, int key, int connfd)
 {
         ReqResp rq;
         ReqResp rp;
-	char list[MAX_NUM_FILES*MAX_FILENAME];
 	rp.status = -1;
 	rp.size = 0;
 	rp.key = key;
@@ -287,20 +287,23 @@ int mycloud_delfile(char *port, int key, char* filename)
 int mycloud_listfiles(char *port, int key)
 {
 	int i;
-	bool first = true;
+	bool hasfiles = false;
+	char * tempbuffer; 
+	tempbuffer = malloc(MAX_FILENAME+1);
 	for(i = 0; i < MAX_NUM_FILES; i++)
 	{
 		if(!files[i].empty)
 		{
-			if(first == true)
-			{
-				strncpy(list, files[i].filename, sizeof(files[i].filename));
-				first = false;
-			}
-			else
-			{
-				strncat(list, files[i].filename, sizeof(files[i].filename));
-			}
+			strncpy(tempbuffer, files[i].filename, sizeof(files[i].filename));
+			strncpy(tempbuffer, "\n", 1);
+			strcat(list, tempbuffer);
+			hasfiles = true;
 		}
 	}
+	if(hasfiles == true)
+	{
+		return 0;
+	}
+	return -1;
+		
 }
