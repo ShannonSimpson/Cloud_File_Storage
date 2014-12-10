@@ -19,7 +19,7 @@ storage files[MAX_NUM_FILES];
 int response_check(ReqResp * rq, ReqResp * rp)
 {
 
-        if(rp->type == GET || rp->type == LIST)
+        if(rp->type == GET)
         {
                 if(rp->size > 0)
                 {
@@ -38,9 +38,12 @@ int response_check(ReqResp * rq, ReqResp * rp)
         if(rp->type == DELETE)
         {
                 int i;
-		if(rp->status == 0)
+		for(i = 0; i < MAX_NUM_FILES; i++)
 		{
-			return 0;
+			if((strcmp(rp->filename, rq->filename)==0) && (files[i].empty == true))
+			{
+				return 0;
+			}
 		}
 		return -1;
         }
