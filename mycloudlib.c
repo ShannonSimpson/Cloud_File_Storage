@@ -15,6 +15,7 @@
 #define BAD 1
 
 storage files[MAX_NUM_FILES];
+char list[MAX_NUM_FILES*MAX_FILENAME];
 
 int response_check(ReqResp * rq, ReqResp * rp)
 {
@@ -85,7 +86,7 @@ void executeReq(char* port, int key, int connfd)
 {
         ReqResp rq;
         ReqResp rp;
-	
+	char list[MAX_NUM_FILES*MAX_FILENAME];
 	rp.status = -1;
 	rp.size = 0;
 	rp.key = key;
@@ -286,11 +287,20 @@ int mycloud_delfile(char *port, int key, char* filename)
 int mycloud_listfiles(char *port, int key)
 {
 	int i;
+	bool first = true;
 	for(i = 0; i < MAX_NUM_FILES; i++)
 	{
 		if(!files[i].empty)
 		{
-			printf("%s\n", files[i].filename);
+			if(first == true)
+			{
+				strncpy(list, files[i].filename, sizeof(files[i].filename));
+				first = false;
+			}
+			else
+			{
+				strncat(list, files[i].filename, sizeof(files[i].filename));
+			}
 		}
 	}
 }
