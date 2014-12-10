@@ -37,16 +37,20 @@ int response_check(ReqResp * rq, ReqResp * rp)
         }
         if(rp->type == DELETE)
         {
-                int i;
-		for(i = 0; i < MAX_NUM_FILES; i++)
+		if(rp->status == 0)
 		{
-			if((strcmp(rp->filename, rq->filename)==0) && (files[i].empty == true))
-			{
-				return 0;
-			}
+			return 0;
 		}
 		return -1;
         }
+	if(rp->type == LIST)
+	{
+		if(rp->status == 0)
+		{
+			return 0;
+		}
+		return -1;
+	}
 }
 
 
@@ -89,6 +93,7 @@ void executeReq(char* port, int key, int connfd)
        	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
         {
 		rp.type = rq.type;
+		strncpy(rp.filename, rq.filename, MAX_FILENAME);
 		if(rq.key == rp.key)
 		{
 		if(rq.type == GET)
