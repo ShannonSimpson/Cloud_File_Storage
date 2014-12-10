@@ -47,57 +47,65 @@ int response_check(ReqResp * rq, ReqResp * rp)
 }
 
 
-void printOut(ReqResp * rq)
+void printOut(ReqResp * rp, int connfd)
 {
-        printf("Secret Key = %d\n", rq->key);
-        printf("Request Type = %s\n", name_rq(rq->type));
-        if(rq->type != LIST)
+        printf("Secret Key = %d\n", rp->key);
+        printf("Request Type = %s\n", name_rq(rp->type));
+        if(rp->type != LIST)
         {
-                printf("Filename = %s\n", rq->filename);
+                printf("Filename = %s\n", rp->filename);
         }
         else
         {
                 printf("Filename = NONE\n");
         }
+	if(rp->status == 0)
+	{
+		printf("Operation Status = Success\n");
+		send(connfd, rp, size_of_ReqResp(rp), 0);
+	}
+	else if(rp->status == -1)
+	{
+		printf("Operation Status = Error\n");
+	}
+	printf("-----------------------------------\n");
+		
 }
 
 
 
 void executeReq(char* port, int key, int connfd)
 {
-        bool complete = false;
         ReqResp rq;
         ReqResp rp;
 	
 	rp.status = -1;
 	rp.size = 0;
+	rp.key = key;
        	size_t recieved;
        	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
         {
 		rp.type = rq.type;
-		if(rq.key == key)
+		if(rq.key == rp.key)
 		{
 		if(rq.type == GET)
                	{
                     	if(mycloud_getfile(rq.filename, &rp) == 0)
                        	{
-                                	complete = true;
+				rp.status = 0;
                        	}
                 }
                 else if(rq.type == STORE)
                 {
-			printf("size: %i\n", rq.size);	
-			printf("soul = %s\n", rq.soul);
                        	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
                        	{
-                               	complete = true;
+				rp.status = 0;
                        	}
                 }
                 else if(rq.type == DELETE)
                 {
                        	if(mycloud_delfile(port, key, rq.filename) == 0)
 			{
-				complete = true;
 				rp.status = 0;
                		}
 		}
@@ -105,27 +113,15 @@ void executeReq(char* port, int key, int connfd)
                 {
                        	if(mycloud_listfiles(port,key) == 0)
 			{
-				complete = true;
+				rp.status = 0;
                 	}
 		}
 		}
         }
 
-        printOut(&rq);
-        if(complete == false)
-        {
-                printf("Operation Status = Error\n");
-        }
-        else if(complete == true)
-        {
-                printf("Operation Status = Success\n");
-                complete = false;
-                send(connfd, &rp, size_of_ReqResp(&rp), 0);
-        }
-        printf("------------------------------------\n");
-
-
+        printOut(&rp, connfd);
 }
+
 
 
 int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
