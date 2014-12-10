@@ -294,9 +294,10 @@ int mycloud_listfiles(char *port, int key)
 	{
 		if(!files[i].empty)
 		{
+			printf("%s\n", files[i].filename);
 			strncpy(tempbuffer, files[i].filename, sizeof(files[i].filename));
 			strncpy(tempbuffer, "\n", 1);
-			strcat(list, tempbuffer);
+			strncat(list, tempbuffer, sizeof(tempbuffer));
 			hasfiles = true;
 		}
 	}
