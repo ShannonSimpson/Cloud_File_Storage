@@ -73,4 +73,14 @@ int mycloud_putfile(char *filename, char *soul, size_t soul_size)
 	return 0;
 }
 
+int delete_file(char* filename) {
+	int i = get_pos(filename);
+	if(i == -1) {
+		return -1;
+	}
+	else {
+		files[i].empty = -1;
+		return 1;
+	}
+}
 
