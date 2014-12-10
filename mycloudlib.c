@@ -33,7 +33,7 @@ void printOut(ReqResp * rq)
 
 
 
-void executeReq(int port, int key, int connfd)
+void executeReq(char* port, int key, int connfd)
 {
         bool complete = false;
         ReqResp rq;
@@ -54,7 +54,7 @@ void executeReq(int port, int key, int connfd)
                 }
                 else if(rq.type == STORE)
                 {
-                        if(mycloud_putfile(host, port, key, rq.filename, rq.soul, rq.size) == 0)
+                        if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
                         {
                                 complete = true;
                         }
@@ -85,7 +85,7 @@ void executeReq(int port, int key, int connfd)
 }
 
 
-int send_request(ReqResp * rq, char* host, int port, int key, ReqResp *rp)
+int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
 {
         int sock;
         struct addrinfo socketInfo;
@@ -201,7 +201,7 @@ int mycloud_getfile(char *filename, ReqResp *rp)
 	return -1;
 }
 
-int mycloud_putfile(char* host, int *port, int *key, char *filename, char *soul, size_t soul_size)
+int mycloud_putfile(int port, int key, char *filename, char *soul, size_t soul_size)
 {
 //	send(sock, rq, size_of_ReqResp(rq), 0);
         /*if(read(sock, rp, MAX_SIZE) < 0) {
