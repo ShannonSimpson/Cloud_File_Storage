@@ -38,36 +38,37 @@ void executeReq(char* port, int key, int connfd)
         bool complete = false;
         ReqResp rq;
         ReqResp rp;
-
-        rp.status = GOOD;
-        rp.size = 0;
-
-        size_t recieved;
-        if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
-        {
-                if(rq.type == GET)
+	if(key == rq.key)
+	{
+	        rp.status = GOOD;
+		rp.size = 0;
+       		size_t recieved;
+       		if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
                 {
-                        if(mycloud_getfile(rq.filename, &rp) == 0)
-                        {
-                                complete = true;
-                        }
-                }
-                else if(rq.type == STORE)
-                {
-                        if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
-                        {
-                                complete = true;
-                        }
-                }
-                else if(rq.type == DELETE)
-                {
-                        complete = true;
-                }
-                else if(rq.type == LIST)
-                {
-                        complete = true;
-                }
-        }
+			if(rq.type == GET)
+                	{
+                        	if(mycloud_getfile(rq.filename, &rp) == 0)
+                        	{
+                                	complete = true;
+                        	}
+                	}
+                	else if(rq.type == STORE)
+                	{	
+                        	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
+                        	{
+                                	complete = true;
+                        	}
+                	}
+                	else if(rq.type == DELETE)
+                	{
+                        	complete = true;
+                	}
+                	else if(rq.type == LIST)
+                	{
+                        	complete = true;
+                	}
+        	}
+	}
         printOut(&rq);
         if(complete == false)
         {
@@ -201,7 +202,7 @@ int mycloud_getfile(char *filename, ReqResp *rp)
 	return -1;
 }
 
-int mycloud_putfile(int port, int key, char *filename, char *soul, size_t soul_size)
+int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul_size)
 {
 //	send(sock, rq, size_of_ReqResp(rq), 0);
         /*if(read(sock, rp, MAX_SIZE) < 0) {
