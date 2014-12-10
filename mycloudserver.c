@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 
 	port = atoi(argv[1]); /* the server listens on a port passed on the command line */
 	key = atoi(argv[2]);
+	printf("key: %i\n", key);
 
 	if((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 		fprintf(stderr, "Nope. No socket obtained.\n");
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
 			exit(-3);
 		}
 		
-		executeReq(port, connfd, key);
+		executeReq(port, key, connfd);
 		//close connection
 		close(connfd);
 	}
