@@ -165,13 +165,12 @@ int main(int argc, char **argv)
 		exit(-1);
 	
 	}
-	if(rp.size > 0)
+	if(rq.type == LIST || rq.type == GET)
 	{
-		printf("%s\n", rp.soul);
-	}
-	if(rp.type == LIST)
-	{
-		printf("%s\n", list);
+		if(rp.size > 0)
+		{
+			printf("%s\n", rp.soul);
+		}
 	}
 	exit(0);
 }

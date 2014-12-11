@@ -1,4 +1,3 @@
-
 #include<stdlib.h>
 #include<stdbool.h>
 #include<stdint.h>
@@ -11,12 +10,8 @@
 #include <string.h>
 #include "reqresp.h"
 #include "mycloudlib.h"
-#define MAX_PENDING 5
-#define GOOD 0
-#define BAD 1
 
 storage files[MAX_NUM_FILES];
-//char list[MAX_NUM_FILES*MAX_FILENAME];
 
 int response_check(ReqResp * rq, ReqResp * rp)
 {
@@ -85,12 +80,15 @@ void printOut(ReqResp * rp, int connfd)
 
 void executeReq(char* port, int key, int connfd)
 {
+	ReqResp list;
         ReqResp rq;
         ReqResp rp;
 	rp.status = -1;
 	rp.size = 0;
 	rp.key = key;
+
        	size_t recieved;
+
        	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
         {
 		rp.type = rq.type;
@@ -120,7 +118,7 @@ void executeReq(char* port, int key, int connfd)
 		}
                 else if(rq.type == LIST)
                 {
-                       	if(mycloud_listfiles(port,key) == 0)
+                       	if(mycloud_listfiles(port,key, &rp) == 0)
 			{
 				rp.status = 0;
                 	}
@@ -247,11 +245,6 @@ int mycloud_getfile(char *filename, ReqResp *rp)
 
 int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul_size)
 {
-//	send(sock, rq, size_of_ReqResp(rq), 0);
-        /*if(read(sock, rp, MAX_SIZE) < 0) {
-                close(sock);
-                return -4;
-        }*/
 
 	int i = get_pos(filename);
 	if(i < 0)
@@ -284,22 +277,29 @@ int mycloud_delfile(char *port, int key, char* filename)
 	}
 }
 
-int mycloud_listfiles(char *port, int key)
+int mycloud_listfiles(char *port, int key, ReqResp *rp)
 {
 	int i;
 	bool hasfiles = false;
-	char * tempbuffer; 
-	tempbuffer = malloc(MAX_FILENAME+1);
+	char * tempbuffer;
+	char * tempbuffer2; 
+	int numfiles = 0;
+	tempbuffer = malloc(1024);
+	tempbuffer2 = malloc(80000);
 	for(i = 0; i < MAX_NUM_FILES; i++)
 	{
 		if(!files[i].empty)
 		{
+			numfiles = numfiles +1;
 			strncpy(tempbuffer, files[i].filename, sizeof(files[i].filename));
-			strncpy(tempbuffer, "\n", 1);
-			strcat(list, tempbuffer);
+			strncat(tempbuffer, "\n", 1);
+			strncat(tempbuffer2, tempbuffer, sizeof(tempbuffer+1));
 			hasfiles = true;
 		}
 	}
+	int size = numfiles * MAX_FILENAME * sizeof(char);
+	memcpy(rp->soul, tempbuffer2, MAX_SIZE);
+	rp->size= size_of_ReqResp(rp);
 	if(hasfiles == true)
 	{
 		return 0;
