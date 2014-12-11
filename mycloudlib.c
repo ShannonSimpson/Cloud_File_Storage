@@ -1,4 +1,3 @@
-
 #include<stdlib.h>
 #include<stdbool.h>
 #include<stdint.h>
@@ -11,7 +10,6 @@
 #include <string.h>
 #include "reqresp.h"
 #include "mycloudlib.h"
-#define MAX_PENDING 5
 #define GOOD 0
 #define BAD 1
 
