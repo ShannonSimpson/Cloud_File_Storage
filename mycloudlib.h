@@ -11,7 +11,6 @@ typedef struct storage_struct {
 	bool empty;
 }storage;
 
-
 int response_check(ReqResp * rq, ReqResp * rp);
 int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp);
 void create_storage();

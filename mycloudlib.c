@@ -10,6 +10,11 @@
 #include <string.h>
 #include "reqresp.h"
 #include "mycloudlib.h"
+<<<<<<< HEAD
+=======
+#define GOOD 0
+#define BAD 1
+>>>>>>> 29288def650d414c880580224820ffaf0d04d971
 
 storage files[MAX_NUM_FILES];
 
@@ -44,6 +49,7 @@ int response_check(ReqResp * rq, ReqResp * rp)
 	{
 		if(rp->status == 0)
 		{
+			printf("%s\n", list);
 			return 0;
 		}
 		return -1;
@@ -300,6 +306,7 @@ int mycloud_listfiles(char *port, int key, ReqResp *rp)
 	int size = numfiles * MAX_FILENAME * sizeof(char);
 	memcpy(rp->soul, tempbuffer2, MAX_SIZE);
 	rp->size= size_of_ReqResp(rp);
+	
 	if(hasfiles == true)
 	{
 		return 0;
