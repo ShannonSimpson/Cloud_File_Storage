@@ -296,11 +296,14 @@ int mycloud_listfiles(char *port, int key)
 		{
 			printf("%s\n", files[i].filename);
 			strncpy(tempbuffer, files[i].filename, sizeof(files[i].filename));
-			strncpy(tempbuffer, "\n", 1);
+			strncat(tempbuffer, "\n", 1);
 			strncat(list, tempbuffer, sizeof(tempbuffer));
 			hasfiles = true;
 		}
 	}
+	
+	printf("%s\n", list);
+
 	if(hasfiles == true)
 	{
 		return 0;
