@@ -289,7 +289,7 @@ int mycloud_listfiles(char *port, int key)
 	int i;
 	bool hasfiles = false;
 	char * tempbuffer; 
-	tempbuffer = malloc(MAX_FILENAME+1);
+	tempbuffer = malloc(1024);
 	for(i = 0; i < MAX_NUM_FILES; i++)
 	{
 		if(!files[i].empty)
