@@ -169,7 +169,8 @@ int main(int argc, char **argv)
 	{
 		printf("%s\n", rp.soul);
 	}
-	if(rp.type == LIST)
+	//if(rp.type == LIST)
+	else
 	{
 		printf("%s\n", list);
 	}

@@ -47,6 +47,7 @@ int response_check(ReqResp * rq, ReqResp * rp)
 	{
 		if(rp->status == 0)
 		{
+			printf("%s\n", list);
 			return 0;
 		}
 		return -1;
