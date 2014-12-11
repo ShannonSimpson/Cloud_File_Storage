@@ -9,122 +9,20 @@
 #include "mycloudlib.h"
 #include "reqresp.h"
 
-/*int send_request(ReqResp * rq, char* host, char *port, int *key, ReqResp *rp)
-{
-	int sock;
-	struct addrinfo socketInfo;
-        struct addrinfo *p;
-        struct addrinfo *serverInfo;
-
-        memset(&socketInfo, 0, sizeof(struct addrinfo));
- 
-	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		fprintf(stderr, "Failed to get socket\n"); 
-		return -2;
-	}
-
-	socketInfo.ai_family = AF_INET;
-	socketInfo.ai_socktype = SOCK_STREAM;
-	socketInfo.ai_flags = 0;
-	socketInfo.ai_protocol = 0;
-
-	if(getaddrinfo(host, port, &socketInfo, &serverInfo)!= 0){
-		fprintf(stderr, "Hostname failed.\n");
-		return -4;
-	}
-	for(p = serverInfo; p!=NULL; p=p->ai_next)
-	{
-		if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol))== -1)
-		{
-			perror("server: socket");
-			continue;
-		}
-	
-	
-//	printf("here1\n");
-		if(connect(sock, p->ai_addr, p->ai_addrlen) == -1)
-		{
-			close(sock);
-			fprintf(stderr, "Server connection failed.\n");
-			continue;	
-		}
-	}
-
-	if(rq->type == STORE)
-	{
-		mycloud_putfile(host, port, key, rq->filename, rq->soul, rq->size);
-				
-	}
-*	send(sock, rq, size_of_ReqResp(rq), 0);
-	if(read(sock, rp, MAX_SIZE) < 0) {
-		close(sock);
-		return -4;
-	}
-*/
-	//handle_response(rp);
-
-/*	if(rp->status == 1)
-	{
-		close(sock);
-		printf("error\n");
-	}
-	if(rp->size > 0)
-	{
-		printf("%s\n", rp->returns);
-	}
-	close(sock);
-	freeaddrinfo(serverInfo);
-	printf("request sent successfully\n");
-	return 0;
-}*/
-/*int response_check(ReqResp * rq, ReqResp * rp)
-{
-	
-	if(rp->type == GET || rp->type == LIST)
-	{
-		if(rp->size > 0)
-		{
-			return 0;	
-		}
-		return -1;
-	}
-	if(rp->type == STORE)
-	{
-		if((rp->size > 0) && (strcmp(rp->soul, rq->soul) == 0));
-		{
-			return 0;
-		}
-		return -1;
-	}
-	if(rp->type == DELETE)
-	{
-		int i; 
-		for(i = 0; i < MAX_NUM_FILES; i++)
-		{
-			if(files[i].filename == rq->filename);
-			{
-				return -1;
-			}
-		}
-		return 0; 
-	}
-}*/
-
 
 int main(int argc, char **argv)
 {
 	char *port;
 	char *host;
-	//rio_t rio;
+	ReqResp rq;
+	ReqResp rp;
 	
+	//handle arguments
 	if(argc < 5) 
 	{
 		fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> (<file>)\n", argv[1]);
 		exit(0);
 	}
-	ReqResp rq;
-	ReqResp rp;
 	rq.size = 0;
 	
 	host = argv[2];
@@ -136,7 +34,7 @@ int main(int argc, char **argv)
 	{
 		if(argc != 5)
 		{
-			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> (<file>)\n", argv[1]);
+			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> \n", argv[1]);
 	        	exit(0);
 
 		}
@@ -145,7 +43,7 @@ int main(int argc, char **argv)
 	{
 		if(argc != 6)
 		{
-			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> (<file>)\n", argv[1]);
+			fprintf(stderr, "usage: %s <request> <host> <port> <secret_key> <file>\n", argv[1]);
                         exit(0);
 		}
 		strncpy(rq.filename, argv[5], MAX_FILENAME);
@@ -154,17 +52,21 @@ int main(int argc, char **argv)
 
 	if(rq.type == STORE)
 	{
+		//get size of request
 		rq.size = fread(rq.soul, sizeof(char), MAX_SIZE, stdin);
-		rq.soul[rq.size] = 0;	
-		rq.size = rq.size +1;
+		// empty soul
+		rq.soul[rq.size] = 0;
+		//add null terminator	
+		rq.size = rq.size + 1;
 	}
 
-	
+	//check validity of send_request to server
 	if (send_request(&rq, host, port, rq.key, &rp) < 0) 
 	{
 		exit(-1);
 	
 	}
+	//handle printing on client side for list and get
 	if(rq.type == LIST || rq.type == GET)
 	{
 		if(rp.size > 0)

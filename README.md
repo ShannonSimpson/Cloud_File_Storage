@@ -27,11 +27,15 @@ LICENSE ----------- Protect our rights to our program.
 makefile ---------- File that will generate .o files, compile, and run executables generated.
 mycloudclient.c --- Handles the client and connection to the server.
 mycloudlib.c ------ File that contains the functions the execute library functions.
-mycloudserver.c --- 
-reqresp.c ---------
+mycloudserver.c --- Handles the server side of the connection. Remains connected until forced out.
+reqresp.c --------- Struct and functions for requests and responses. 
 
   HEADERS  :
 mycloudlib.h ------ Declaration of mycloudlib.c file and funcitons
 reqresp.h --------- Declaration of reqresp.c file and functions
 
-
+  MC FILES:
+mcdel ------------- Can be used to execute delete <~/../mcdel <host> <port> <key> <filename>
+mcput ------------- Can be used to execute put <~/../mcput <host> <port> <key> <filename>
+mcget ------------- Can be used to execute delete <~/../mcget <host> <port> <key> <filename>
+mclist ------------- Can be used to execute list <~/../mclist <host> <port> <key>

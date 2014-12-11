@@ -1,1 +1,16 @@
-This is the documentation file.
+DOCUMENTATION FILE
+
+Algorithms: 
+	As far as algorithms go, none were utilized in the making of the mycloud programs. The majority of the code are structs, functions, and code for socket connections. The use of socket, types, and inet libraries was preferred for our group due to background knowledge that stemmed from another course (networking). Hence, csapp.c and csapp.h were not utilized, although they were provided. (Files are not in this program.)
+
+Special Features:
+	The server side of the cloud will print out a status report with response information that was passed through the connection on each connection (successful or not). The client side will only print out information to the user if the get command is used and a file with the same filename is stored in the cloud, or the list command is run and there are files stored in the cloud. On success, get will print out the contents in the file stored. On success, list will print a list of each file stored in the cloud, currently.
+
+	In addtion, if a file is not piped into put when run, the user must enter file info into stdin and press CTRL+D to send. Otherwise, it will work on a found EOF. 
+
+Limiations:
+	Sizes may not be reported correctly. 
+	Small Issue: mc files will report error if make clean not run before make
+
+Outside Sources:
+	In order to properly set up the socket connection and use other library functions found in this program, we utilized linux.die.net for any questions on setup, options, and function calls. 

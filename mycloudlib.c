@@ -11,8 +11,10 @@
 #include "reqresp.h"
 #include "mycloudlib.h"
 
+//create storage struct
 storage files[MAX_NUM_FILES];
 
+//check that the response is valid
 int response_check(ReqResp * rq, ReqResp * rp)
 {
 
@@ -50,7 +52,7 @@ int response_check(ReqResp * rq, ReqResp * rp)
 	}
 }
 
-
+//server console printing and sending of info back to client on success
 void printOut(ReqResp * rp, int connfd)
 {
         printf("Secret Key = %d\n", rp->key);
@@ -93,44 +95,46 @@ void executeReq(char* port, int key, int connfd)
         {
 		rp.type = rq.type;
 		strncpy(rp.filename, rq.filename, MAX_FILENAME);
+		//check for equal key
 		if(rq.key == rp.key)
 		{
-		if(rq.type == GET)
-               	{
-                    	if(mycloud_getfile(rq.filename, &rp) == 0)
-                       	{
-				rp.status = 0;
-                       	}
-                }
-                else if(rq.type == STORE)
-                {
-                       	if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
-                       	{
-				rp.status = 0;
-                       	}
-                }
-                else if(rq.type == DELETE)
-                {
-                       	if(mycloud_delfile(port, key, rq.filename) == 0)
-			{
-				rp.status = 0;
-               		}
-		}
-                else if(rq.type == LIST)
-                {
-                       	if(mycloud_listfiles(port,key, &rp) == 0)
-			{
-				rp.status = 0;
+			if(rq.type == GET)
+               		{
+               		     	if(mycloud_getfile(rq.filename, &rp) == 0)
+        	               	{
+					rp.status = 0;
+                       		}
                 	}
+             	   	else if(rq.type == STORE)
+               		{
+                       		if(mycloud_putfile(port, key, rq.filename, rq.soul, rq.size) == 0)
+                       		{
+					rp.status = 0;
+                       		}
+               		}
+              		else if(rq.type == DELETE)
+               		{
+               	        	if(mycloud_delfile(port, key, rq.filename) == 0)
+				{
+					rp.status = 0;
+               			}
+			}
+        	        else if(rq.type == LIST)
+	                {
+	                       	if(mycloud_listfiles(port,key, &rp) == 0)
+				{
+					rp.status = 0;
+                		}
+			}
 		}
-		}
+		//else rp status will be bad
         }
-
+	//print server info 
         printOut(&rp, connfd);
 }
 
 
-
+//handles the sending of requests to the server
 int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
 {
         int sock;
@@ -157,14 +161,14 @@ int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
         }
         for(p = serverInfo; p!=NULL; p=p->ai_next)
         {
+		//create socket
                 if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol))== -1)
                 {
                         perror("server: socket");
                         continue;
                 }
 
-
-//      printf("here1\n");
+		//connect to server
                 if(connect(sock, p->ai_addr, p->ai_addrlen) == -1)
                 {
                         close(sock);
@@ -172,30 +176,37 @@ int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp)
                         continue;
                 }
         }
-
+	//send and wait for recieve
 	send(sock, rq, size_of_ReqResp(rq), 0);
-
-//	executeReq(&host, port, connfd, key);
+	
         if(read(sock, rp, MAX_SIZE) < 0) {
                 close(sock);
                 return -4;
         }
-	
-	if(response_check(rq, rp) == 0)
+	//check response if bad print error
+	if(response_check(rq, rp) != 0)
 	{
-		printf("success\n");
-	}
-	else
-	{
+		if(rq->type == LIST)
+		{
+			printf("no files found\n");
+		}
+		if(rq->type == GET)
+		{
+			printf("file not found\n");
+		}
+		else
+		{
+			printf("something went wrong\n");
+		}
 		printf("error\n");
 	}
-
+	//cleanup connection
         close(sock);
         freeaddrinfo(serverInfo);
         return 0;
 }
                 
-
+//initialize file storage : called in server
 void create_storage()
 {
 	int i;
@@ -205,6 +216,7 @@ void create_storage()
 	}
 }
 
+//get position of file in storage
 int get_pos(char *filename)
 {
 	int i;
@@ -217,7 +229,7 @@ int get_pos(char *filename)
 	}
 	return -1;
 }
-
+//get position of next open position in storage
 int next_pos()
 {
 	int i;
@@ -230,7 +242,7 @@ int next_pos()
 	}
 	return -1;
 }
-
+// function for getting file info from storage
 int mycloud_getfile(char *filename, ReqResp *rp)
 {
 	int i = get_pos(filename);
@@ -242,16 +254,16 @@ int mycloud_getfile(char *filename, ReqResp *rp)
 	}
 	return -1;
 }
-
+//fucntion for placing file in storage
 int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul_size)
 {
 
 	int i = get_pos(filename);
-	if(i < 0)
+	if(i == -1)
 	{
 		i = next_pos();
 
-		if(i < 0)
+		if(i == -1)
 		{
 			return -1;
 		}		
@@ -262,7 +274,7 @@ int mycloud_putfile(char *port, int key, char *filename, char *soul, size_t soul
 	memcpy(files[i].soul, soul, soul_size);
 	return 0;
 }
-
+//function for deleting file
 int mycloud_delfile(char *port, int key, char* filename)
 {
 	int i = get_pos(filename);
@@ -276,7 +288,7 @@ int mycloud_delfile(char *port, int key, char* filename)
 		return 0;
 	}
 }
-
+//function for passing files stored to client side
 int mycloud_listfiles(char *port, int key, ReqResp *rp)
 {
 	int i;

@@ -3,14 +3,14 @@
 #define MAX_NUM_FILES 100
 #include "reqresp.h"
 #include<stdbool.h>
-
+//file storage struct
 typedef struct storage_struct {
 	char filename[MAX_FILENAME];
 	char soul[MAX_SIZE];
 	size_t size;
 	bool empty;
 }storage;
-
+//initialization of functions in lib.c
 int response_check(ReqResp * rq, ReqResp * rp);
 int send_request(ReqResp * rq, char* host, char* port, int key, ReqResp *rp);
 void create_storage();

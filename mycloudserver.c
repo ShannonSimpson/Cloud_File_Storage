@@ -21,74 +21,8 @@
 #include "reqresp.h"
 #include "mycloudlib.h"
 
-#define MAX_PENDING 5
-#define GOOD 0
-#define BAD 1
+#define PENDING 5
 
-/*void printOut(ReqResp * rq)
-{
-	printf("Secret Key = %d\n", rq->key);
-	printf("Request Type = %s\n", name_rq(rq->type));
-	if(rq->type != LIST)
-	{
-		printf("Filename = %s\n", rq->filename);
-	}
-	else
-	{
-		printf("Filename = NONE\n");
-	}
-}*/
-
-/*void executeReq(int connfd, int key)
-{
-	bool complete = false;
-	ReqResp rq;
-	ReqResp rp;
-
-	rp.status = GOOD;
-	rp.size = 0; 
-
-	size_t recieved;
-	if((recieved = recv(connfd, &rq, sizeof(ReqResp), 0)) != 0)
-	{
-		if(rq.type == GET)
-		{
-			if(mycloud_getfile(rq.filename, &rp) == 0)
-			{
-				complete = true;
-			}
-		}
-		else if(rq.type == STORE)
-		{
-			if(mycloud_putfile(rq.filename, rq.soul, rq.size) == 0)
-			{
-				complete = true;
-			}
-		}
-		else if(rq.type == DELETE)
-		{
-			complete = true;
-		}
-		else if(rq.type == LIST)
-		{
-			complete = true;
-		}
-	}
-	printOut(&rq);
-	if(complete == false)
-	{
-		printf("Operation Status = Error\n");
-	}
-	else if(complete == true)
-	{
-		printf("Operation Status = Success\n");
-		complete = false;
-		send(connfd, &rp, size_of_ReqResp(&rp), 0);
-	}
-	printf("------------------------------------\n");
-	
-	
-}*/
 int main(int argc, char **argv) {
 	// create and configure the listening socket
 	int listenfd, connfd, port, key;	
@@ -118,17 +52,17 @@ int main(int argc, char **argv) {
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serveraddr.sin_port = htons(port);
 
+	create_storage();
 	if(bind(listenfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
 		printf("Could not bind to port, sir.\n");
 		exit(-1);
 	}
 	
-	if(listen(listenfd, MAX_PENDING) < 0) {
+	if(listen(listenfd, PENDING) < 0) {
 		fprintf(stderr, "Listening(...) Call failed. Hanging up now.\n");
 		exit(-1);
 	}
 
-	create_storage();
 	while(1)
 	{
 		client_length = sizeof(clientaddr);
@@ -140,7 +74,7 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "Accept(...) call failed.\n");
 			exit(-1);
 		}
-		
+		//pass required items to execution stage		
 		executeReq(port, key, connfd);
 		close(connfd);
 	}
